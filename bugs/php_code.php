@@ -25,8 +25,7 @@ if(isset($_REQUEST["message"]))
 {
 
 // If the security level is not MEDIUM or HIGH
-if($_COOKIE["security_level"] != "1" && $_COOKIE["security_level"] != "2")
-{
+
 
 ?>
 <p><i><?php @eval ("echo " . $_REQUEST["message"] . ";");?></i></p>
@@ -45,6 +44,6 @@ else
 
 }
 
-}
+
 
 ?>
