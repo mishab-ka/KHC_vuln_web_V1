@@ -11,7 +11,9 @@ sleep 2
 echo "[+] insralling..."
 apt install php
 apt install netcat
+sleep 2
 clear
+sleep 2
 echo "██╗░░██╗██╗░░██╗░█████╗░"
 echo "██║░██╔╝██║░░██║██╔══██╗"
 echo "█████═╝░███████║██║░░╚═╝"
