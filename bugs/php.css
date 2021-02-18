@@ -25,9 +25,6 @@ p{
   transition: 0.5s;
 
 }
-p:hover{
-  font-size: 30px;
-}
 
 .box .btn button{
   width: 350px;
