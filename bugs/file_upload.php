@@ -1,6 +1,3 @@
-<?php
-session_start();
-?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -22,11 +19,9 @@ session_start();
             place-items: center center;
             align-items: center;
             color: white;
-            
 
 
         }
-
         input[type="file"]{
             display: none;
 
@@ -73,77 +68,66 @@ session_start();
     </style>
 </head>
 <body>
-  <?php
-    if (isset($_SESSION['message']) && $_SESSION['message'])
-    {
-      echo '<p class="notification">'.$_SESSION['message'].'</p>';
-      unset($_SESSION['message']);
-    }
-  ?>
     <form action="file_upload.php" method="post" enctype="multipart/form-data">
-    <input type="file" id="file-upload" name="uploadedFile">
-    <label for="file-upload">
+    <input type="file" name="the_file" id="file">
+    <label for="file">
         <span class="material-icons">
             add_photo_alternate
             </span>
         Choose a Photo
     </label>
-    <input type="submit" name="uploadBtn" value="Upload" />
+    <input type="submit" name="submit" value="Upload!">
     </form>
 
 
 
 </body>
 </html>
-
 <?php
-session_start();
+    $currentDirectory = getcwd();
+    $uploadDirectory = "/uploads/";
 
-$message = '';
-if (isset($_POST['uploadBtn']) && $_POST['uploadBtn'] == 'Upload')
-{
-  if (isset($_FILES['uploadedFile']) && $_FILES['uploadedFile']['error'] === UPLOAD_ERR_OK)
-  {
-    // get details of the uploaded file
-    $fileTmpPath = $_FILES['uploadedFile']['tmp_name'];
-    $fileName = $_FILES['uploadedFile']['name'];
-    $fileSize = $_FILES['uploadedFile']['size'];
-    $fileType = $_FILES['uploadedFile']['type'];
-    $fileNameCmps = explode(".", $fileName);
-    $fileExtension = strtolower(end($fileNameCmps));
+    $errors = []; // Store errors here
 
-    // sanitize file-name
-    $newFileName = md5(time() . $fileName) . '.' . $fileExtension;
+    $fileExtensionsAllowed = ['jpeg','jpg','png','php']; // These will be the only file extensions allowed
 
-    // check if file has one of the following extensions
-    $allowedfileExtensions = array('jpg', 'gif', 'png', 'zip', 'txt', 'xls', 'doc', 'php');
+    $fileName = $_FILES['the_file']['name'];
+    $fileSize = $_FILES['the_file']['size'];
+    $fileTmpName  = $_FILES['the_file']['tmp_name'];
+    $fileType = $_FILES['the_file']['type'];
+    $fileExtension = strtolower(end(explode('.',$fileName)));
 
-    if (in_array($fileExtension, $allowedfileExtensions))
-    {
-      // directory in which the uploaded file will be moved
-      $uploadFileDir = './uploads/';
-      $dest_path = $uploadFileDir . $newFileName;
+    $uploadPath = $currentDirectory . $uploadDirectory . basename($fileName);
+    $upload1 = $uploadDirectory . basename($fileName);
 
-      if(move_uploaded_file($fileTmpPath, $dest_path))
-      {
-        $message ='File is successfully uploaded.';
-        echo "http://localhost:9999/bugs/uploads/$newFileName";
+    if (isset($_POST['submit'])) {
+
+      if (! in_array($fileExtension,$fileExtensionsAllowed)) {
+        $errors[] = "This file extension is not allowed. Please upload a JPEG or PNG file";
       }
-      else
-      {
-        $message = 'There was some error moving the file to upload directory. Please make sure the upload directory is writable by web server.';
+
+      if ($fileSize > 4000000) {
+        $errors[] = "File exceeds maximum size (4MB)";
       }
+
+      if (empty($errors)) {
+        $didUpload = move_uploaded_file($fileTmpName, $uploadPath);
+
+        if ($didUpload) {
+
+          echo "The file http://localhost:8888/bugs$upload1 has been uploaded";
+
+
+        } else {
+          echo "                                                    ";
+          echo "An error occurred. Please contact the administrator.";
+
+        }
+      } else {
+        foreach ($errors as $error) {
+          echo $error . "These are the errors" . "\n";
+        }
+      }
+
     }
-    else
-    {
-      $message = 'Upload failed. Allowed file types: ' . implode(',', $allowedfileExtensions);
-    }
-  }
-  else
-  {
-    $message = 'There is some error in the file upload. Please check the following error.<br>';
-    $message .= 'Error:' . $_FILES['uploadedFile']['error'];
-  }
-}
-$_SESSION['message'] = $message;
-// header("Location: index.php");
+?>
